@@ -37,7 +37,14 @@ export async function launchDocdown() {
 
 /** Opens popup.html in a tab, pointed at `targetPage` (the tab to clip) through ?tabId=. */
 export async function openPopup(ext, targetPage, size = { width: 580, height: 560 }) {
-  const tabId = await ext.worker.evaluate(async (url) => (await chrome.tabs.query({ url }))[0].id, targetPage.url());
+  // tabs.query({ url }) cannot match chrome:// pages, so look the tab up by URL and fall back to the
+  // newest non-extension tab.
+  const tabId = await ext.worker.evaluate(async (url) => {
+    const tabs = await chrome.tabs.query({});
+    const match = tabs.find((t) => t.url === url || t.pendingUrl === url);
+    if (match) return match.id;
+    return Math.max(...tabs.filter((t) => !(t.url || '').startsWith('chrome-extension://')).map((t) => t.id));
+  }, targetPage.url());
   const popup = await ext.context.newPage();
   await popup.setViewportSize(size);
   await popup.goto(`chrome-extension://${ext.extensionId}/src/popup.html?tabId=${tabId}`);

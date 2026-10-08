@@ -30,7 +30,7 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 | 1 | Real-input corpus: capture real pages as fixtures | done |
 | 2 | Conversion engine `src/clip.js` | done |
 | 3 | Popup (preview, copy, download), options page, context menu, shortcut | done |
-| 4 | End-to-end tests on every fixture | todo |
+| 4 | End-to-end tests on every fixture | done |
 | 5 | Store assets, listing, privacy policy, zip | todo |
 | 6 | Final architecture doc + README | todo |
 
@@ -235,3 +235,45 @@ reset button, images checkbox, shortcut note. Template saves are debounced 600 m
 - End-to-end tests of the popup, menu and options follow in step 4 (`test/docdown-extension.mjs`
   launches a temporary copy of the extension with `<all_urls>` added, because automated tests have no
   real click to grant activeTab; the shipped manifest is unchanged).
+
+## Docdown step 4 — end-to-end tests of the real extension
+**How the extension is driven** (`test/docdown-extension.mjs`)
+- `launchDocdown()` copies `docdown/` to a temp folder, adds `"host_permissions": ["<all_urls>"]` to
+  that copy only (automated tests have no real toolbar click to grant activeTab), loads it with
+  `--load-extension` in Playwright's Chromium, and reads the extension ID from the service worker URL.
+- `openPopup(ext, page)` opens `src/popup.html?tabId=<id of page>` in a tab, so the popup clips that
+  page exactly as the real popup clips the active tab. The tab is found by URL in `chrome.tabs.query({})`
+  (a `url` filter cannot match `chrome://` pages), falling back to the newest non-extension tab.
+- Fixture pages are served under their real URLs with all other requests aborted (same harness as the
+  engine tests).
+
+**Tests** (`test/docdown.e2e.test.mjs`, 8):
+1. Shipped manifest: permissions exactly `activeTab, contextMenus, scripting, storage`; no host
+   permissions, no content scripts; command `_execute_action` = `Alt+Shift+M`.
+2. MDN: basic front matter exact (YAML-quoted title and URL, date), ≥ 15 ```` ```js ```` blocks taken from
+   shadow DOM, stats line format, preview renders ≥ 15 `pre code`, Article mode selected.
+3. Python docs: Whole page longer than Article; front matter `none` / `custom` (exact custom block:
+   `domain: docs.python.org`, `clipped: "…Z"`, `lang: en`, `tags: []`); images off removes `![`;
+   both choices persisted in `storage.sync`.
+4. GitHub README: Copy = exact Markdown; Copy as prompt = `Source: <title> — <url>` + Markdown inside a
+   ```` ````markdown ```` fence longer than the inner ```` ``` ```` fences; edited text is what gets copied
+   and downloaded; download file name `markedjs-marked-a-markdown-parser-and-compiler-built-for-speed-github.md`.
+5. Vietnamese Wikipedia: text keeps diacritics; file name transliterated `markdown-wikipedia-tieng-viet.md`.
+6. Context-menu hand-off: `pendingMode: 'selection'` in `storage.session` → popup opens in Selection
+   mode, consumes the key; with nothing selected → "Nothing is selected…"; with the JSON table
+   selected → exactly that table.
+7. `chrome://version` → "Chrome does not allow extensions to read this page…", Copy disabled.
+8. Options page: sample of the default template, custom template with `{site}` and an unknown `{nope}`
+   (left as is), debounced save, default mode `page` applied by the next popup; reset afterwards.
+
+**Findings**
+- **The Windows clipboard returns CRLF line endings** (`navigator.clipboard.readText()` after
+  `writeText()` with LF). This is normal OS behaviour, editors accept it; the test normalises CRLF.
+  If LF-only output matters, Download .md always writes LF.
+- `grantPermissions(['clipboard-read'], { origin: 'chrome-extension://…' })` is refused ("opaque
+  origins"); granting for the whole context works.
+- Readability strips the `GitHub - ` prefix from the page title, so the clip title (and file name)
+  starts with `markedjs/marked`.
+
+**Verified:** `npm run test:docdown` → 17 pass (9 engine + 8 e2e); `npm test` (Readown) → 10 pass.
+New script `npm run test:all` runs both suites.
