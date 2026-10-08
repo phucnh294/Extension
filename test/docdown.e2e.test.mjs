@@ -188,3 +188,14 @@ test('options page: settings and template sample', async () => {
   await options.waitForFunction(async () => (await chrome.storage.sync.get('defaultMode')).defaultMode === 'article');
   await options.close();
 });
+
+test('preview renders GitHub alerts as alert boxes (Docusaurus admonitions)', async () => {
+  const { page, popup } = await clippedPopup('docusaurus-admonitions');
+  const kinds = await popup.$$eval('#preview .markdown-alert', (els) => [...new Set(els.map((e) => e.className.match(/markdown-alert-(\w+)/)[1]))]);
+  assert.ok(kinds.includes('note') && kinds.includes('tip') && kinds.includes('warning'), `alert kinds: ${kinds}`);
+  assert.equal(await popup.locator('#preview .markdown-alert-title').first().textContent(), 'Note');
+  assert.equal(await popup.locator('#preview .markdown-alert', { hasText: '[!' }).count(), 0, 'marker text removed');
+  assert.match(await markdownOf(popup), /^> \[!NOTE\]$/m, 'the Markdown itself keeps the GitHub alert syntax');
+  await popup.close();
+  await page.close();
+});

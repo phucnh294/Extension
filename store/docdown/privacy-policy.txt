@@ -1,0 +1,29 @@
+Docdown — Privacy Policy
+Last updated: 2026-10-07
+
+Docdown is a Chrome extension that converts the web page you are viewing (or its main article, or the
+part you selected) into Markdown text.
+
+Data collection
+The extension does not collect, transmit, sell or share any personal or usage data.
+It has no analytics, no tracking and no server of its own.
+
+What the extension reads
+• Only the tab you explicitly clip — by clicking the toolbar button, pressing the keyboard shortcut or
+  choosing a Docdown item in the right-click menu (Chrome's activeTab permission). It reads that page's
+  content at that moment to convert it to Markdown inside your browser.
+• The result is shown in the extension's popup. It leaves the popup only when you copy it to your
+  clipboard or download it as a file yourself.
+
+What the extension stores
+• Settings only (default clip mode, front matter choice and template, images on/off), saved with
+  chrome.storage.sync so they follow your Chrome profile. No page content is stored.
+
+Network
+The extension makes no network requests of its own.
+
+Remote code
+All code is bundled inside the extension package; nothing is downloaded or executed from remote sources.
+
+Contact
+Questions about this policy: hoaphu.nyc@gmail.com

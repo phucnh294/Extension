@@ -31,7 +31,7 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 | 2 | Conversion engine `src/clip.js` | done |
 | 3 | Popup (preview, copy, download), options page, context menu, shortcut | done |
 | 4 | End-to-end tests on every fixture | done |
-| 5 | Store assets, listing, privacy policy, zip | todo |
+| 5 | Store assets, listing, privacy policy, zip | done |
 | 6 | Final architecture doc + README | todo |
 
 ## Docdown step 0 — setup (shared build helpers and scaffold)
@@ -277,3 +277,35 @@ reset button, images checkbox, shortcut note. Template saves are debounced 600 m
 
 **Verified:** `npm run test:docdown` → 17 pass (9 engine + 8 e2e); `npm test` (Readown) → 10 pass.
 New script `npm run test:all` runs both suites.
+
+## Docdown step 5 — Chrome Web Store package and assets
+**What was done**
+- Name re-checked on the store: search "Docdown" → no results (2026-10-07).
+- `scripts/store-assets-docdown.mjs` (`npm run store-assets:docdown`, needs network): opens **live**
+  pages (MDN, Python docs, Docusaurus) at 1280×800, opens the real popup on them (test copy of the
+  extension), and composes a screenshot with the popup where Chrome shows it (top right, shadow).
+  Fixtures are not used here because offline fixtures have no site CSS. Output in
+  `store/docdown/screenshots/`: `1-mdn-article.png`, `2-python-markdown.png` (custom front matter,
+  Markdown tab), `3-docusaurus-alerts.png` (preview scrolled to the alerts), `4-options.png`; promo
+  tiles `store/docdown/promo-small-440x280.png`, `promo-marquee-1400x560.png` (green theme).
+- Popup preview now renders `> [!NOTE]`-style blockquotes as GitHub alert boxes (`styleAlerts()` in
+  `popup.js` adds `markdown-alert markdown-alert-<type>` + a title; github-markdown-css styles them).
+  The Markdown text itself is unchanged. New e2e test covers it.
+- `store/docdown/listing.txt`: name, 132-char summary, description (EN + VI), category, and the
+  Privacy-tab text: single purpose + justification for `activeTab`, `scripting`, `contextMenus`,
+  `storage`, remote code = No, no data collected.
+- `store/docdown/privacy-policy.txt` (contact hoaphu.nyc@gmail.com). Must be published at a public URL
+  (e.g. a new Gist, like Readown's) before submitting.
+- `npm run package:docdown` → `dist/docdown-1.0.0.zip`: 28 files, 311 KB, `unzip -t` clean, manifest
+  permissions `activeTab, scripting, contextMenus, storage`.
+
+**Seen on the live sites while taking screenshots** (live-site check of the engine): MDN article →
+`≈ 3,009 tokens`, code blocks rendered; Python docs → custom front matter with quoted URL and
+`clipped` timestamp, escaped `\_\_init\_\_.py`; Docusaurus → note/tip/info/warning/danger boxes.
+
+**Verified:** `npm run test:docdown` → 18 pass (9 engine + 9 e2e).
+
+**To publish (manual, the account owner):** create a Gist with `store/docdown/privacy-policy.txt` →
+Developer Dashboard → New item → upload `dist/docdown-1.0.0.zip` → listing/Privacy text from
+`store/docdown/listing.txt` → images from `store/docdown/` → Submit. Docdown requests no host
+permissions, so the "Broad Host Permissions" in-depth review that Readown hit should not apply.

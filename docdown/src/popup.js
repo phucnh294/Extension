@@ -89,6 +89,26 @@
     }
     const { fragment } = MDV.renderMarkdown(state.text);
     article.replaceChildren(fragment);
+    styleAlerts(article);
+  }
+
+  /** "> [!NOTE]" blockquotes → GitHub alert boxes (github-markdown-css has the .markdown-alert styles). */
+  function styleAlerts(root) {
+    const LABELS = { NOTE: 'Note', TIP: 'Tip', IMPORTANT: 'Important', WARNING: 'Warning', CAUTION: 'Caution' };
+    for (const quote of root.querySelectorAll('blockquote')) {
+      const first = quote.firstElementChild;
+      const m = first && first.tagName === 'P' && /^\[!(NOTE|TIP|IMPORTANT|WARNING|CAUTION)\]\s*/.exec(first.textContent);
+      if (!m) continue;
+      quote.classList.add('markdown-alert', `markdown-alert-${m[1].toLowerCase()}`);
+      const title = document.createElement('p');
+      title.className = 'markdown-alert-title';
+      title.textContent = LABELS[m[1]];
+      // Remove the marker text; keep anything after it on the same paragraph.
+      const marker = first.firstChild;
+      if (marker && marker.nodeType === 3) marker.data = marker.data.slice(m[0].length);
+      if (!first.textContent.trim() && !first.querySelector('img')) first.remove();
+      quote.prepend(title);
+    }
   }
 
   function showTab(tab) {

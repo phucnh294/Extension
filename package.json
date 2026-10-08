@@ -10,7 +10,8 @@
     "build:docdown": "node scripts/build-docdown.mjs",
     "package:docdown": "node scripts/build-docdown.mjs && node scripts/package.mjs --ext docdown",
     "test:docdown": "node scripts/build-docdown.mjs && node --test test/docdown.engine.test.mjs test/docdown.e2e.test.mjs",
-    "test:all": "npm test && npm run test:docdown"
+    "test:all": "npm test && npm run test:docdown",
+    "store-assets:docdown": "node scripts/build-docdown.mjs && node scripts/store-assets-docdown.mjs"
   },
   "keywords": [],
   "author": "",
