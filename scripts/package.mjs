@@ -1,4 +1,5 @@
-// Zips extension/ into dist/readown-<version>.zip for upload to the Chrome Web Store.
+// Zips an extension folder into dist/<name>-<version>.zip for upload to the Chrome Web Store.
+// Usage: node scripts/package.mjs [--ext extension|docdown]   (default: extension = Readown)
 // Plain zip writer (deflate + CRC32 from node:zlib), so no extra dependency is needed.
 import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative, sep } from 'node:path';
@@ -6,7 +7,8 @@ import { fileURLToPath } from 'node:url';
 import { crc32, deflateRawSync } from 'node:zlib';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const EXT = join(ROOT, 'extension');
+const extArg = process.argv.indexOf('--ext');
+const EXT = join(ROOT, extArg > 0 ? process.argv[extArg + 1] : 'extension');
 const EXCLUDE = [/^\./, /\.map$/, /^Thumbs\.db$/i, /^desktop\.ini$/i];
 
 function walk(dir) {
@@ -76,6 +78,6 @@ end.writeUInt32LE(centralSize, 12);
 end.writeUInt32LE(offset, 16);
 
 mkdirSync(join(ROOT, 'dist'), { recursive: true });
-const out = join(ROOT, 'dist', `readown-${manifest.version}.zip`);
+const out = join(ROOT, 'dist', `${manifest.short_name.toLowerCase()}-${manifest.version}.zip`);
 writeFileSync(out, Buffer.concat([...locals, ...centrals, end]));
 console.log(`package: ${relative(ROOT, out)} (${files.length} files)`);

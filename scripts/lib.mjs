@@ -73,3 +73,26 @@ export function validateExtension(extDir) {
   }
   return manifest;
 }
+
+// github-markdown.css switches light/dark only by prefers-color-scheme. Re-scope the two colour
+// blocks so a viewer theme setting (data-theme on .mdv) can force either one.
+export function themedGithubCss() {
+  const css = readFileSync(join(NM, 'github-markdown-css/github-markdown.css'), 'utf8');
+  const blocks = {};
+  const stripped = css.replace(
+    /@media \(prefers-color-scheme: (dark|light)\) \{\s*\.markdown-body, \[data-theme="\1"\] \{([\s\S]*?)\n  \}\n\}\n?/g,
+    (_, scheme, body) => {
+      blocks[scheme] = body.replace(/^ {2}/gm, '');
+      return '';
+    }
+  );
+  if (!blocks.dark || !blocks.light) fail('github-markdown.css layout changed: colour blocks not found');
+  if (/prefers-color-scheme|\[data-theme/.test(stripped)) fail('github-markdown.css: unexpected leftover theme rules');
+  return [
+    '/* github-markdown-css, re-scoped by scripts/build.mjs for the viewer theme switch */',
+    `.markdown-body {${blocks.light}\n}`,
+    `.mdv[data-theme="dark"] .markdown-body {${blocks.dark}\n}`,
+    `@media (prefers-color-scheme: dark) {\n.mdv[data-theme="auto"] .markdown-body {${blocks.dark}\n}\n}`,
+    stripped,
+  ].join('\n');
+}

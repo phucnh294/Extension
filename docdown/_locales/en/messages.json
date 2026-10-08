@@ -1,0 +1,125 @@
+{
+  "extName": {
+    "message": "Docdown – Web page to Markdown"
+  },
+  "extDescription": {
+    "message": "Copy any web page, doc or selection as clean, LLM-ready Markdown: code languages kept, links absolute, front matter. 100% local."
+  },
+  "actionTitle": {
+    "message": "Clip this page to Markdown (Alt+Shift+M)"
+  },
+  "menuSelection": {
+    "message": "Clip selection to Markdown"
+  },
+  "menuPage": {
+    "message": "Clip page to Markdown"
+  },
+  "modeArticle": {
+    "message": "Article"
+  },
+  "modePage": {
+    "message": "Whole page"
+  },
+  "modeSelection": {
+    "message": "Selection"
+  },
+  "tabPreview": {
+    "message": "Preview"
+  },
+  "tabMarkdown": {
+    "message": "Markdown"
+  },
+  "frontMatter": {
+    "message": "Front matter"
+  },
+  "fmNone": {
+    "message": "None"
+  },
+  "fmBasic": {
+    "message": "Basic"
+  },
+  "fmCustom": {
+    "message": "Custom"
+  },
+  "images": {
+    "message": "Images"
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "copied": {
+    "message": "Copied!"
+  },
+  "copyPrompt": {
+    "message": "Copy as prompt"
+  },
+  "download": {
+    "message": "Download .md"
+  },
+  "tokens": {
+    "message": "≈ $VALUE$ tokens",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "chars": {
+    "message": "$VALUE$ characters",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "clipping": {
+    "message": "Clipping…"
+  },
+  "errRestricted": {
+    "message": "Chrome does not allow extensions to read this page (browser pages, the Chrome Web Store, PDFs)."
+  },
+  "errNoSelection": {
+    "message": "Nothing is selected on the page. Select some text first, or switch to Article / Whole page."
+  },
+  "errEmpty": {
+    "message": "No readable content was found. Try “Whole page”."
+  },
+  "errGeneric": {
+    "message": "Could not clip this page: $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "optTitle": {
+    "message": "Docdown settings"
+  },
+  "optDefaultMode": {
+    "message": "Default clip mode"
+  },
+  "optFrontMatter": {
+    "message": "Front matter"
+  },
+  "optTemplate": {
+    "message": "Custom front matter template"
+  },
+  "optTemplateHelp": {
+    "message": "Placeholders: {title} {url} {domain} {date} {datetime} {lang} {excerpt}. Values are inserted as YAML-safe text."
+  },
+  "optImages": {
+    "message": "Keep images"
+  },
+  "optSaved": {
+    "message": "Saved"
+  },
+  "optReset": {
+    "message": "Reset template"
+  },
+  "optShortcut": {
+    "message": "Keyboard shortcut: Alt+Shift+M (change it at chrome://extensions/shortcuts)."
+  }
+}

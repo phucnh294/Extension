@@ -1,0 +1,125 @@
+{
+  "extName": {
+    "message": "Docdown – Web page to Markdown"
+  },
+  "extDescription": {
+    "message": "Chép trang web, tài liệu hay đoạn chọn thành Markdown sạch cho AI: giữ ngôn ngữ code, link tuyệt đối, front matter. Chạy offline."
+  },
+  "actionTitle": {
+    "message": "Chuyển trang này sang Markdown (Alt+Shift+M)"
+  },
+  "menuSelection": {
+    "message": "Chuyển đoạn chọn sang Markdown"
+  },
+  "menuPage": {
+    "message": "Chuyển trang sang Markdown"
+  },
+  "modeArticle": {
+    "message": "Bài viết"
+  },
+  "modePage": {
+    "message": "Cả trang"
+  },
+  "modeSelection": {
+    "message": "Đoạn chọn"
+  },
+  "tabPreview": {
+    "message": "Xem trước"
+  },
+  "tabMarkdown": {
+    "message": "Markdown"
+  },
+  "frontMatter": {
+    "message": "Front matter"
+  },
+  "fmNone": {
+    "message": "Không"
+  },
+  "fmBasic": {
+    "message": "Cơ bản"
+  },
+  "fmCustom": {
+    "message": "Tuỳ chỉnh"
+  },
+  "images": {
+    "message": "Hình ảnh"
+  },
+  "copy": {
+    "message": "Sao chép"
+  },
+  "copied": {
+    "message": "Đã chép!"
+  },
+  "copyPrompt": {
+    "message": "Chép làm prompt"
+  },
+  "download": {
+    "message": "Tải .md"
+  },
+  "tokens": {
+    "message": "≈ $VALUE$ token",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "chars": {
+    "message": "$VALUE$ ký tự",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "clipping": {
+    "message": "Đang chuyển…"
+  },
+  "errRestricted": {
+    "message": "Chrome không cho extension đọc trang này (trang của trình duyệt, Chrome Web Store, PDF)."
+  },
+  "errNoSelection": {
+    "message": "Chưa chọn đoạn nào trên trang. Hãy bôi đen một đoạn, hoặc chuyển sang Bài viết / Cả trang."
+  },
+  "errEmpty": {
+    "message": "Không tìm thấy nội dung đọc được. Thử chế độ “Cả trang”."
+  },
+  "errGeneric": {
+    "message": "Không chuyển được trang này: $VALUE$",
+    "placeholders": {
+      "value": {
+        "content": "$1"
+      }
+    }
+  },
+  "settings": {
+    "message": "Cài đặt"
+  },
+  "optTitle": {
+    "message": "Cài đặt Docdown"
+  },
+  "optDefaultMode": {
+    "message": "Chế độ mặc định"
+  },
+  "optFrontMatter": {
+    "message": "Front matter"
+  },
+  "optTemplate": {
+    "message": "Mẫu front matter tuỳ chỉnh"
+  },
+  "optTemplateHelp": {
+    "message": "Biến: {title} {url} {domain} {date} {datetime} {lang} {excerpt}. Giá trị được chèn an toàn cho YAML."
+  },
+  "optImages": {
+    "message": "Giữ hình ảnh"
+  },
+  "optSaved": {
+    "message": "Đã lưu"
+  },
+  "optReset": {
+    "message": "Khôi phục mẫu"
+  },
+  "optShortcut": {
+    "message": "Phím tắt: Alt+Shift+M (đổi tại chrome://extensions/shortcuts)."
+  }
+}
