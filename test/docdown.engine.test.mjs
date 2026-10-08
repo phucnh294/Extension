@@ -30,12 +30,22 @@ before(async () => {
 });
 after(async () => browser?.close());
 
-function checkInvariants(name, markdown) {
+function checkInvariants(name, markdown, pageUrl) {
   const prose = withoutFences(markdown);
   assert.ok(markdown.length > 1000, `${name}: suspiciously short (${markdown.length} chars)`);
   assert.doesNotMatch(prose, /\]\((?:\/|\.\.?\/)/, `${name}: relative link left in prose`);
   assert.doesNotMatch(prose, /<(script|style)\b/i, `${name}: script/style markup leaked`);
   assert.doesNotMatch(markdown, /DOCDOWNALERT/, `${name}: alert marker not converted`);
+  // A heading that is only a link back to the same page (`## [Syntax](…#syntax)`) means the
+  // self-link was not unwrapped.
+  for (const line of prose.match(/^#{1,6} \[[^\]]*\]\([^)]*\)$/gm) || []) {
+    const href = line.slice(line.lastIndexOf('(') + 1, -1);
+    assert.ok(!href.split('#')[0] || !pageUrl || href.split('#')[0] !== pageUrl.split('#')[0], `${name}: self-linking heading "${line}"`);
+  }
+  // A line holding only the language name right before a fence = a code header leaked (MDN "js").
+  for (const m of markdown.matchAll(/^([\w+#.-]+)\n\n```([\w+#.-]+)$/gm)) {
+    assert.notEqual(m[1], m[2], `${name}: language label "${m[1]}" repeated above its code block`);
+  }
   for (const { code } of fences(markdown)) {
     assert.doesNotMatch(code, /^(Copy|Copied!?|Copy code)$/m, `${name}: copy-button text inside a code block`);
     assert.doesNotMatch(code, /^1\n2\n3\n/, `${name}: line numbers inside a code block`);
@@ -52,7 +62,7 @@ for (const fixture of fixtures()) {
       assert.equal(result.ok, true, `${fixture.id}/${mode}: ${JSON.stringify(result)}`);
       writeFileSync(join(OUT, `${fixture.id}.${mode}.md`), result.markdown);
       const name = `${fixture.id}/${mode}`;
-      checkInvariants(name, result.markdown);
+      checkInvariants(name, result.markdown, fixture.url);
       assert.equal(result.url, fixture.url);
 
       const md = result.markdown;

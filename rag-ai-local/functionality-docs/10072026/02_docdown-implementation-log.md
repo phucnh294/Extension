@@ -29,7 +29,7 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 | 0 | Setup: shared build helpers, `docdown/` scaffold, npm scripts | done |
 | 1 | Real-input corpus: capture real pages as fixtures | done |
 | 2 | Conversion engine `src/clip.js` | done |
-| 3 | Popup (preview, copy, download), options page, context menu, shortcut | todo |
+| 3 | Popup (preview, copy, download), options page, context menu, shortcut | done |
 | 4 | End-to-end tests on every fixture | todo |
 | 5 | Store assets, listing, privacy policy, zip | todo |
 | 6 | Final architecture doc + README | todo |
@@ -180,3 +180,58 @@ Measured on the corpus (article mode): MDN 17 ```` ```js ```` blocks from shadow
 2 tables + 6 alerts, MkDocs 17 blocks + 21 alerts, Docusaurus 13 blocks + 14 alerts (nested ones
 included), GitHub README 8 blocks + 10 headings, React 6 ```` ```javascript ```` blocks, Wikipedia 2
 tables + Vietnamese text intact. Clipping takes 50–320 ms per page.
+
+## Docdown step 3 — popup, options page, context menu, shortcut
+**User flow**
+1. The user triggers Docdown on a tab in one of three ways — each one grants **activeTab** for that tab:
+   - toolbar button → popup opens;
+   - **Alt+Shift+M** → manifest command `_execute_action` → popup opens;
+   - right-click → "Clip selection to Markdown" (only when text is selected) or "Clip page to
+     Markdown" → `src/background.js` stores `pendingMode` (`selection` / `article`) in
+     `chrome.storage.session` and calls `chrome.action.openPopup()` (Chrome ≥ 127). If opening fails
+     (window not focused), it puts a green "1" badge on the button; the stored mode is used next time.
+2. `src/popup.js` starts: loads settings (`DocdownFM.loadSettings`), takes `pendingMode` if present
+   (then deletes it), finds the target tab (active tab; `?tabId=N` for tests), and clips:
+   `chrome.scripting.executeScript({ files: [Readability, turndown, gfm, clip.js] })` then
+   `executeScript({ func: (o) => DocdownClip.run(o), args: [{ mode, images }] })`.
+3. Result handling: errors → message in the status box (`restricted` for chrome://, Web Store, PDF
+   viewer — detected from the `executeScript` error text; `no-selection`; `empty`; `exception`). Article
+   fallback → info note and the "Whole page" mode highlighted.
+4. Output = `DocdownFM.build(settings, result)` (front matter) + `result.markdown`.
+   - **Preview** tab: `MDV.renderMarkdown()` from Readown's renderer (`vendor/readown-render.js`:
+     marked + DOMPurify string mode) inside `.mdv[data-theme=auto] .markdown-body` (GitHub CSS).
+   - **Markdown** tab: editable textarea; edits are what Copy/Download use; changing the front-matter
+     select only rebuilds the text while it is unedited.
+   - Footer: `≈ N tokens` (characters / 4, labelled approximate) and character count.
+5. Actions: **Copy** (`navigator.clipboard.writeText` — allowed because it follows a click in the
+   popup), **Copy as prompt** (`Source: <title> — <url>` + the Markdown in a ```` ```markdown ````
+   fence longer than any backtick run inside), **Download .md** (Blob + `<a download>`, no `downloads`
+   permission; file name = title transliterated to ASCII, `đ→d`, lowercase, `-` separated, ≤ 80 chars).
+6. Changing mode or the Images checkbox re-clips; Images and Front matter choices are saved.
+
+**Front matter** (`src/frontmatter.js`, `globalThis.DocdownFM`, shared by popup and options)
+- `none` / `basic` (`title`, `source`, `date`) / `custom` (user template; default adds `domain`,
+  `clipped`, `lang`, `tags: []`).
+- Placeholders `{title} {url} {domain} {date} {datetime} {lang} {excerpt} {site} {byline}`; unknown
+  `{x}` is left as is. Every value goes through `yamlScalar()`: plain when harmless, otherwise a JSON
+  double-quoted string (valid YAML) — titles with `:` or `|` and URLs stay valid YAML.
+
+**Options page** (`src/options.html/js`, opens in a tab from the ⚙ button or chrome://extensions):
+default mode, front matter choice, template editor with a live sample (filled with an MDN example),
+reset button, images checkbox, shortcut note. Template saves are debounced 600 ms because
+`storage.sync` limits writes per minute.
+
+**Engine fixes found while looking at the real popup output (MDN)**
+- Headings wrapped in a link to themselves (`## [Syntax](…#syntax)`) → the link is unwrapped when an
+  `<a>` inside `h1–h6` points to the same page (same origin, path and query, with a `#hash`).
+- A `js` line before every MDN code block → MDN's `.example-header` (language label + copy button,
+  outside the `pre`) is skipped everywhere.
+- Both are now engine-test invariants for every fixture.
+
+**Verified**
+- Popup screenshot on the real MDN fixture: preview renders, Markdown tab shows YAML-safe front matter
+  (`title: "Array.prototype.map() - JavaScript | MDN"`), footer `≈ 3,520 tokens · 14,080 characters`.
+- `npm run test:docdown` → 9 pass.
+- End-to-end tests of the popup, menu and options follow in step 4 (`test/docdown-extension.mjs`
+  launches a temporary copy of the extension with `<all_urls>` added, because automated tests have no
+  real click to grant activeTab; the shipped manifest is unchanged).

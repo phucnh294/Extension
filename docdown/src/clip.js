@@ -23,7 +23,9 @@
     'dialog', 'source', 'track', 'audio', 'video', 'map', 'area',
   ]);
   const SKIP_SELECTOR =
-    '.sr-only, .visually-hidden, .screen-reader-text, [aria-hidden="true"], [hidden], .mw-editsection, .editsection';
+    '.sr-only, .visually-hidden, .screen-reader-text, [aria-hidden="true"], [hidden], .mw-editsection, .editsection, ' +
+    // code-block headers that only repeat the language name / hold a copy button (MDN <mdn-code-example>)
+    '.example-header';
   // Inside code blocks: line numbers, copy buttons, headers that repeat the language name.
   const CODE_NOISE_SELECTOR = [
     '.line-number', '.line-numbers-rows', '.linenumber', '.lineno', '.linenos', '.gutter', '.hljs-ln-numbers',
@@ -183,6 +185,16 @@
     }
   }
 
+  function isSamePageAnchor(url) {
+    try {
+      const target = new URL(url);
+      const here = new URL(location.href);
+      return !!target.hash && target.origin === here.origin && target.pathname === here.pathname && target.search === here.search;
+    } catch (_) {
+      return false;
+    }
+  }
+
   function imageSource(img) {
     const candidates = [img.currentSrc, img.getAttribute('src'), img.getAttribute('data-src'), img.getAttribute('data-original')];
     for (const c of candidates) {
@@ -254,7 +266,17 @@
     }
     if (tag === 'a' && el.hasAttribute('href')) {
       const href = el.getAttribute('href');
-      if (!/^\s*javascript:/i.test(href)) copy.setAttribute('href', absoluteUrl(href));
+      const url = /^\s*javascript:/i.test(href) ? '' : absoluteUrl(href);
+      // A heading that links to itself (MDN, many doc sites) → plain heading text.
+      if (url && el.closest('h1, h2, h3, h4, h5, h6') && isSamePageAnchor(url)) {
+        const fragment = ctx.doc.createDocumentFragment();
+        for (const child of composedChildren(el)) {
+          const c = cloneComposed(child, ctx);
+          if (c) fragment.appendChild(c);
+        }
+        return fragment;
+      }
+      if (url) copy.setAttribute('href', url);
     }
     if (alert) ctx.stats.alerts++;
 

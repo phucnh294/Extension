@@ -1,5 +1,57 @@
 <!doctype html>
 <html>
-  <head><meta charset="utf-8" /><title>Docdown</title></head>
-  <body><p>Docdown — work in progress.</p></body>
+  <head>
+    <meta charset="utf-8" />
+    <title>Docdown</title>
+    <link rel="stylesheet" href="../vendor/github-markdown.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../icons/icon32.png" width="20" height="20" alt="" />
+      <strong>Docdown</strong>
+      <div class="modes" role="radiogroup">
+        <button type="button" role="radio" data-mode="article" data-i18n="modeArticle">Article</button>
+        <button type="button" role="radio" data-mode="page" data-i18n="modePage">Whole page</button>
+        <button type="button" role="radio" data-mode="selection" data-i18n="modeSelection">Selection</button>
+      </div>
+      <button type="button" id="settings" class="icon" data-i18n-title="settings" title="Settings">⚙</button>
+    </header>
+
+    <div class="options">
+      <label>
+        <span data-i18n="frontMatter">Front matter</span>
+        <select id="front-matter">
+          <option value="none" data-i18n="fmNone">None</option>
+          <option value="basic" data-i18n="fmBasic">Basic</option>
+          <option value="custom" data-i18n="fmCustom">Custom</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="images" /> <span data-i18n="images">Images</span></label>
+      <div class="tabs" role="tablist">
+        <button type="button" role="tab" data-tab="preview" data-i18n="tabPreview">Preview</button>
+        <button type="button" role="tab" data-tab="markdown" data-i18n="tabMarkdown">Markdown</button>
+      </div>
+    </div>
+
+    <main>
+      <div id="status" class="status" hidden></div>
+      <div id="preview" class="mdv" data-theme="auto"><article class="markdown-body"></article></div>
+      <textarea id="markdown" spellcheck="false" hidden></textarea>
+    </main>
+
+    <footer>
+      <span id="stats" class="stats"></span>
+      <span class="spacer"></span>
+      <button type="button" id="download" data-i18n="download">Download .md</button>
+      <button type="button" id="copy-prompt" data-i18n="copyPrompt">Copy as prompt</button>
+      <button type="button" id="copy" class="primary" data-i18n="copy">Copy</button>
+    </footer>
+
+    <script src="../vendor/marked.umd.js"></script>
+    <script src="../vendor/purify.min.js"></script>
+    <script src="../vendor/readown-render.js"></script>
+    <script src="frontmatter.js"></script>
+    <script src="popup.js"></script>
+  </body>
 </html>
