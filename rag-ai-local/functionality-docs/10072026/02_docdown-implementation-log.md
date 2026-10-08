@@ -27,7 +27,7 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 | Step | Content | Status |
 |---|---|---|
 | 0 | Setup: shared build helpers, `docdown/` scaffold, npm scripts | done |
-| 1 | Real-input corpus: capture real pages as fixtures | todo |
+| 1 | Real-input corpus: capture real pages as fixtures | done |
 | 2 | Conversion engine `src/clip.js` | todo |
 | 3 | Popup (preview, copy, download), options page, context menu, shortcut | todo |
 | 4 | End-to-end tests on every fixture | todo |
@@ -69,3 +69,39 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
   produces `dist/readown-1.0.0.zip` (24 files).
 - `npm run build:docdown`; Chromium loads `docdown/` with name "Docdown – Web page to Markdown",
   permissions `activeTab, contextMenus, scripting, storage`, service worker running.
+
+## Docdown step 1 — real-input corpus (fixtures from real pages)
+**What was done**
+- `scripts/capture-docdown-fixtures.mjs`: opens each URL in Playwright Chromium, waits for network idle,
+  scrolls the whole page (lazy content), removes every `<script>` (also inside shadow roots) and saves
+  `test/fixtures/docdown/real/<id>/page.html` + `meta.json` (`url`, `license`, `title`, `capturedAt`,
+  `bytes`, `shadowRoots`). `SOURCES.txt` lists source URL and licence per fixture.
+  Re-run: `node scripts/capture-docdown-fixtures.mjs [id ...]`.
+- Corpus (7 pages, 1.7 MB), each chosen for a conversion problem:
+
+| Fixture | Why it is in the corpus |
+|---|---|
+| `mdn-array-map` | code examples live in **shadow DOM** (`<mdn-code-example>`), `brush: js` language class, notecards, a table |
+| `react-thinking-in-react` | React/Next SSR page, Sandpack code blocks, heavy SPA markup |
+| `docusaurus-admonitions` | Prism code blocks (`language-md` on `pre` and wrapper, one `<span class="token-line">` + `<br>` per line, Copy button), Docusaurus admonitions `theme-admonition-note` |
+| `mkdocs-material-admonitions` | `div.language-yaml.highlight > pre > code`, admonitions `div.admonition.note` + `p.admonition-title`, tabbed blocks |
+| `github-readme-marked` | GitHub README: `div.highlight.highlight-source-shell > pre`, heading anchor links with SVG, a table, GitHub UI chrome around the article |
+| `python-json` | Sphinx: `div.highlight-python3 > div.highlight > pre`, `¶` header links, tables, `div.admonition` |
+| `vi-wikipedia-markdown` | Vietnamese text (diacritics), Wikipedia tables, references |
+
+**Findings that shape the engine (step 2)**
+- **MDN code is inside open shadow roots.** The server HTML has 18 `<pre class="brush: js">`, but MDN's
+  scripts move them into `<mdn-code-example>` shadow roots; `outerHTML` then shows empty elements. The
+  capture now serializes open shadow roots with `Element.getHTML({ shadowRoots })` as
+  `<template shadowrootmode="open">`, which the browser turns back into shadow roots on load (MDN: 87
+  shadow roots, 17 `pre` restored). **The clipper must read the composed tree (light + shadow DOM).**
+- Language hints differ per site: `language-*` (Prism/Docusaurus/MkDocs), `highlight-source-*`
+  (GitHub), `highlight-<lang>` on an ancestor (Sphinx), `brush: <lang>` (MDN).
+- Admonition markup differs per site: `theme-admonition-<type>` (Docusaurus), `admonition <type>` +
+  `admonition-title` (MkDocs, Sphinx), `notecard <type>` (MDN), `markdown-alert-<type>` (GitHub).
+- **Stack Overflow is not in the corpus**: automated browsers get a Cloudflare challenge page
+  ("Just a moment..."). Bot protection is not bypassed; Stack Overflow is verified manually later.
+
+**Verified**
+- Every fixture has the expected content: MDN 17 `pre` after reload of the serialized shadow DOM,
+  GitHub 8 `pre` + 1 table, Python 15 `pre` + 2 tables, Docusaurus 13 `pre`, MkDocs 17 `pre`.

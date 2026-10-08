@@ -1,0 +1,25 @@
+Real pages captured for Docdown tests by scripts/capture-docdown-fixtures.mjs.
+Each folder: page.html (rendered DOM, scripts removed, open shadow roots serialized as declarative shadow DOM) + meta.json.
+Content belongs to its authors under the licenses below; used here only as test input.
+
+docusaurus-admonitions
+  https://docusaurus.io/docs/markdown-features/admonitions
+  CC-BY 4.0 (Docusaurus docs); captured 2026-10-08
+github-readme-marked
+  https://github.com/markedjs/marked
+  MIT (marked README); captured 2026-10-08
+mdn-array-map
+  https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/map
+  CC-BY-SA 2.5 (MDN contributors); captured 2026-10-08
+mkdocs-material-admonitions
+  https://squidfunk.github.io/mkdocs-material/reference/admonitions/
+  MIT (mkdocs-material); captured 2026-10-08
+python-json
+  https://docs.python.org/3/library/json.html
+  PSF Documentation License; captured 2026-10-08
+react-thinking-in-react
+  https://react.dev/learn/thinking-in-react
+  CC-BY 4.0 (react.dev); captured 2026-10-08
+vi-wikipedia-markdown
+  https://vi.wikipedia.org/wiki/Markdown
+  CC-BY-SA 4.0 (Wikipedia); captured 2026-10-08
