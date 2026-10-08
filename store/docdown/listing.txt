@@ -8,33 +8,34 @@ CATEGORY
 Developer Tools
 
 DESCRIPTION
-Turn any documentation page, README, article or selection into clean Markdown you can paste into ChatGPT, Claude, Cursor, Obsidian, Notion or your docs — without the junk that plain copy-paste brings along.
+(No product or brand names here: the first submission was rejected for "excessive keywords" — violation
+"Yellow Argon" — because it listed AI tools, note apps and documentation sites by name.)
+
+Turn any documentation page, article or text selection into clean Markdown you can paste into an AI assistant, a notes app or your own docs, without the clutter that plain copy and paste brings along.
 
 Built for developers
 • Code blocks keep their language (```js, ```python, ```yaml …) and come out clean: no line numbers, no "Copy" buttons, no shell prompts
-• Reads code that modern doc sites hide inside web components (shadow DOM), e.g. MDN examples
-• Docs callouts (Docusaurus, MkDocs, Sphinx, MDN, GitHub) become GitHub alerts: > [!NOTE], > [!WARNING]…
-• Tables become proper Markdown tables; links and images become absolute URLs
-• Heading permalinks, edit links and other page chrome are removed
+• Reads code that modern documentation sites place inside web components (shadow DOM)
+• Note, tip and warning boxes become Markdown callouts: > [!NOTE], > [!WARNING]
+• Tables become Markdown tables; links and images become full URLs
+• Heading anchors, edit links and other page clutter are removed
 
 Three ways to clip
-• Article — the main content, detected automatically
-• Whole page — everything visible
-• Selection — just the part you selected (a selection inside a code block stays a code block)
+• Article: the main content, detected automatically
+• Whole page: everything visible
+• Selection: only the part you selected (a selection inside a code block stays a code block)
 
 Before you copy
 • Preview the result or edit the Markdown
-• Approximate token count, so you know what you are pasting into an LLM
-• Front matter: none, basic (title, source, date) or your own template with {title} {url} {domain} {date} {datetime} {lang} {excerpt} — e.g. metadata for a RAG / notes corpus
-• Copy, Copy as prompt (with the source link), or Download .md
+• Approximate token count, so you know how much text you are pasting into an AI assistant
+• Front matter: none, basic (title, source, date) or your own template with placeholders such as {title}, {url} and {date}
+• Copy, Copy as prompt (with the source link) or Download .md
 
-Fast to reach
-• Toolbar button, right-click menu ("Clip selection / page to Markdown") or Alt+Shift+M
+Quick to reach
+• Toolbar button, right-click menu or Alt+Shift+M
 
 Private by design
-Docdown only reads the tab you click it on (activeTab), runs entirely in your browser, sends nothing anywhere and contains no remote code. Settings are stored with Chrome sync storage only.
-
-Companion to Readown – Markdown file viewer: clip with Docdown, read .md files with Readown.
+Docdown only reads the tab you click it on, runs entirely in your browser, sends nothing anywhere and contains no remote code. Settings are stored with Chrome sync storage only.
 
 PERMISSION JUSTIFICATION (Privacy tab)
 Single purpose: Convert the current web page, its main article or the selected part into Markdown text for the user to copy or download.
@@ -48,15 +49,15 @@ Data usage: No user data is collected or transmitted.
 ---------------------------------------------------------------------
 MÔ TẢ TIẾNG VIỆT (nếu thêm ngôn ngữ vi cho listing)
 
-Biến trang tài liệu, README, bài viết hay đoạn bạn chọn thành Markdown sạch để dán vào ChatGPT, Claude, Cursor, Obsidian, Notion hay tài liệu của bạn — không kèm rác như khi copy-paste thường.
+Biến trang tài liệu, bài viết hay đoạn bạn chọn thành Markdown sạch để dán vào trợ lý AI, ứng dụng ghi chú hay tài liệu của bạn, không kèm rác như khi sao chép thông thường.
 
 • Khối code giữ đúng ngôn ngữ, bỏ số dòng, nút "Copy", dấu nhắc lệnh
-• Đọc được code nằm trong web component (shadow DOM) như ví dụ của MDN
-• Hộp ghi chú của Docusaurus, MkDocs, Sphinx, MDN, GitHub → GitHub alert > [!NOTE], > [!WARNING]
+• Đọc được code nằm trong web component (shadow DOM)
+• Hộp ghi chú, mẹo, cảnh báo → khối callout Markdown > [!NOTE], > [!WARNING]
 • Bảng thành bảng Markdown; link và ảnh thành địa chỉ đầy đủ
 • 3 chế độ: Bài viết · Cả trang · Đoạn chọn
 • Xem trước, sửa trước khi chép, ước tính số token
-• Front matter: không, cơ bản, hoặc mẫu riêng của bạn (ví dụ metadata cho kho RAG)
+• Front matter: không, cơ bản, hoặc mẫu riêng của bạn
 • Sao chép, Chép làm prompt (kèm link nguồn), hoặc Tải .md
 • Nút trên thanh công cụ, menu chuột phải, hoặc Alt+Shift+M
 • Riêng tư: chỉ đọc tab bạn bấm, chạy hoàn toàn trên máy, không gửi dữ liệu đi đâu
