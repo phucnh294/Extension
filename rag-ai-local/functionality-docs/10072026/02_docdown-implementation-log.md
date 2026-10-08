@@ -28,7 +28,7 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 |---|---|---|
 | 0 | Setup: shared build helpers, `docdown/` scaffold, npm scripts | done |
 | 1 | Real-input corpus: capture real pages as fixtures | done |
-| 2 | Conversion engine `src/clip.js` | todo |
+| 2 | Conversion engine `src/clip.js` | done |
 | 3 | Popup (preview, copy, download), options page, context menu, shortcut | todo |
 | 4 | End-to-end tests on every fixture | todo |
 | 5 | Store assets, listing, privacy policy, zip | todo |
@@ -105,3 +105,78 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 **Verified**
 - Every fixture has the expected content: MDN 17 `pre` after reload of the serialized shadow DOM,
   GitHub 8 `pre` + 1 table, Python 15 `pre` + 2 tables, Docusaurus 13 `pre`, MkDocs 17 `pre`.
+
+## Docdown step 2 — conversion engine (docdown/src/clip.js)
+**Entry point:** `DocdownClip.run({ mode, images, debug })`, injected into the clipped tab after
+`vendor/Readability.js`, `vendor/turndown.js`, `vendor/turndown-plugin-gfm.js`. Guarded by
+`globalThis.DocdownClip`, so a second injection (second click) is a no-op.
+Returns `{ ok: true, markdown, title, url, lang, excerpt, siteName, byline, mode, fallback, stats }`
+or `{ ok: false, error: 'no-selection' | 'empty' | 'exception', message }`.
+`debug: true` adds `{ cloneHtml, articleHtml }` — the input and output of Readability — for tracing.
+
+**Pipeline**
+1. **Composed clone** (`cloneComposed`) — walks the live page as rendered and copies it into a fresh
+   `document.implementation.createHTMLDocument()`:
+   - follows **shadow roots** (`el.shadowRoot`, or `chrome.dom.openOrClosedShadowRoot` in a content
+     script for closed ones) and replaces `<slot>` with its assigned nodes;
+   - drops `script, style, svg, button, iframe, video, form controls…`, elements with `display:none`,
+     `[hidden]`, `[aria-hidden=true]`, screen-reader-only text, Wikipedia `.mw-editsection`;
+   - keeps only `id, class, role, title, alt, lang, dir, colspan, rowspan, start, datetime, cite`;
+     `class`/`id` are kept because Readability scores on them;
+   - **links** → absolute `href` (`javascript:` removed); **links left without text are dropped**;
+   - **images** → absolute `src` from `currentSrc`/`src`/`data-src` (skips GIF/SVG data URIs and
+     inline blobs > 2 KB); removed entirely with `images: false`;
+   - **code blocks** (`pre`) → `<pre data-docdown-lang="…"><code>plain text</code></pre>`. Text is
+     read from the live element: `<br>` and block children become line breaks; line numbers, copy
+     buttons, MDN's example header, `user-select:none` parts (gutters, shell prompts) are skipped.
+     Language: `data-language`/`data-lang`, then classes on `code`, `pre` and up to 4 ancestors:
+     `language-x`/`lang-x`, `highlight-source-x`/`highlight-text-x` (GitHub), `brush: x` (MDN),
+     `highlight-x` (Sphinx), `sourceCode x`, `sp-javascript` (Sandpack). Aliases: `python3→python`,
+     `html-basic→html`, `sh→shell`…; ignored: `default, text, plain, none, notranslate…`;
+   - **admonitions** → `<blockquote>` starting with a marker paragraph `DOCDOWNALERT<TYPE>`; the
+     default title (`Note`, `Warning`…) is removed, a custom title is kept as a bold first line.
+     Detected: `theme-admonition-<t>` (Docusaurus), `admonition <t>` (MkDocs/Sphinx),
+     `notecard <t>` (MDN), `markdown-alert-<t>` (GitHub), `callout`. Types map to GitHub's
+     `NOTE / TIP / IMPORTANT / WARNING / CAUTION`.
+2. **Mode**
+   - `article`: Readability (`charThreshold: 200`) on the clone. If it finds no article (or < 80 chars)
+     → falls back to `page` and returns `fallback: true`. Adds `# <title>` when the text has none.
+   - `page`: the whole composed body.
+   - `selection`: first range of `getSelection()`; clones only nodes the range intersects and slices
+     the boundary text nodes; a selection inside a `pre` stays a code block. No selection →
+     `error: 'no-selection'`.
+3. **Turndown** (`atx` headings, `-` bullets, fenced code, `_em_`, `**strong**`, inlined links) +
+   GFM `strikethrough` and `taskListItems`, plus Docdown rules:
+   `docdownCode` (fence longer than any backtick run inside the code, language from the attribute),
+   `docdownTable` (own converter — every table, first row = header, `colspan` padded, cell newlines →
+   space, `|` escaped), `docdownPermalink` (drops `#`, `¶`, `§`, zero-width permalink links).
+4. **Tidy**: trailing spaces removed, `DOCDOWNALERT<TYPE>` → `[!TYPE]` at any quote depth (nested
+   admonitions), max one blank line, single trailing newline.
+
+**Bugs found on the real corpus and how they were traced** (agent-troubleshooting method: check each
+stage's input and output, walking backwards)
+| Symptom | Stage with correct input → wrong output | Fix |
+|---|---|---|
+| GitHub README lost all `##` headings in article mode | Clone had 15 `h2`, Readability output 0. Experiments on the clone: removing **empty links** restored them. GitHub's permalink `<a>` only holds an SVG; once the SVG is dropped the link is empty and Readability deletes the heading block as link-only boilerplate | drop text-less links while cloning |
+| Python/MkDocs admonitions lost in article mode (6→0, 21→6) | Clone had the `data-docdown-alert` attribute, Readability output had none: Readability rewrites a `div` holding one paragraph into a `p`, losing attributes | admonitions become `<blockquote>` + marker text (survives Readability) |
+| Wikipedia headings lost in article mode | Heading blocks contained `[sửa | sửa mã nguồn]` edit links → link-dense → removed | skip `.mw-editsection` |
+| `> [!NOTE]` followed by an empty `>` line | Turndown writes `"> "` with a trailing space; the marker regex ran before trailing spaces were trimmed | trim first, then replace |
+| Nested admonitions kept `DOCDOWNALERT` | Marker line was `> > DOCDOWN…` | regex accepts any quote depth |
+| React code blocks without language | Sandpack puts `sp-javascript` on `pre` | Sandpack pattern |
+
+**Tests:** `test/docdown.engine.test.mjs` + `test/docdown-harness.mjs`. Each fixture is served under its
+original URL with all other requests aborted (offline, deterministic), the engine files are injected,
+and article + page mode are checked against invariants:
+no relative links outside code, no `script/style`, no leftover marker, no "Copy" or `1\n2\n3` line
+numbers inside code blocks, minimum code blocks / languages / tables / alerts / headings per fixture
+(recorded after reading the output by hand), article shorter than page, no Readability fallback.
+Selection tests: no selection → `no-selection`; selecting the Python JSON table → exactly that table;
+selecting part of a Python code block → a ```` ```python ```` block with exactly the selected text.
+Also: `images: false`, double injection, synthetic tiny page → article falls back to page.
+Outputs are written to `test/output/docdown/<fixture>.<mode>.md` (git-ignored) for reading by hand.
+
+**Verified:** `npm run test:docdown` → 9 pass, 0 fail.
+Measured on the corpus (article mode): MDN 17 ```` ```js ```` blocks from shadow DOM, Python 15 blocks +
+2 tables + 6 alerts, MkDocs 17 blocks + 21 alerts, Docusaurus 13 blocks + 14 alerts (nested ones
+included), GitHub README 8 blocks + 10 headings, React 6 ```` ```javascript ```` blocks, Wikipedia 2
+tables + Vietnamese text intact. Clipping takes 50–320 ms per page.
