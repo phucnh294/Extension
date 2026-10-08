@@ -5,14 +5,14 @@ last_updated: 2026-10-07
 type: functionality
 project: ut-support
 area: docdown-extension
-status: in-progress
-subtype: plan
-files: [docdown/manifest.json, scripts/lib.mjs, scripts/build-docdown.mjs, scripts/build.mjs, scripts/package.mjs, scripts/icons.mjs, package.json]
+status: implementation-complete
+subtype: design
+files: [docdown/manifest.json, docdown/src/clip.js, docdown/src/popup.js, docdown/src/popup.html, docdown/src/frontmatter.js, docdown/src/options.js, docdown/src/background.js, scripts/lib.mjs, scripts/build-docdown.mjs, scripts/capture-docdown-fixtures.mjs, scripts/store-assets-docdown.mjs, scripts/package.mjs, test/docdown-harness.mjs, test/docdown-extension.mjs, test/docdown.engine.test.mjs, test/docdown.e2e.test.mjs, store/docdown/listing.txt, store/docdown/privacy-policy.txt]
 version: 1
 extraction_method: runtime-observation
 tags: [ui, testing, playwright, process]
-keywords: [Docdown, activeTab, scripting, contextMenus, Readability, Turndown, turndown-plugin-gfm, build-docdown.mjs, lib.mjs, copyVendor, validateExtension, writeIcons, themedGithubCss]
-related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture-gotchas.md, README.md]
+keywords: [Docdown, DocdownClip, DocdownFM, activeTab, scripting, contextMenus, chrome.action.openPopup, pendingMode, Readability, Turndown, turndown-plugin-gfm, shadow DOM, openOrClosedShadowRoot, getHTML, shadowrootmode, DOCDOWNALERT, markdown-alert, data-docdown-lang, build-docdown.mjs, lib.mjs, copyVendor, validateExtension, themedGithubCss, docdown-1.0.0.zip]
+related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture-gotchas.md, README.md, store/docdown/listing.txt, store/docdown/privacy-policy.txt, test/fixtures/docdown/real/SOURCES.txt]
 ---
 
 # Docdown — web page to Markdown extension, implementation flow and step log
@@ -20,8 +20,8 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 ## TL;DR
 - **What:** Docdown ("Docdown – Web page to Markdown") is the second extension in this repo: it turns the current page, the main article or a selection into clean, LLM-ready Markdown (code languages kept, absolute links, front matter), with a preview before copying.
 - **Why:** companion to Readown (which reads `.md`); developers paste docs into LLMs, notes and RAG corpora, and plain copy-paste breaks code blocks and links.
-- **Where:** `docdown/` (shipped), `scripts/build-docdown.mjs`, shared `scripts/lib.mjs`, tests in `test/docdown.e2e.test.mjs`, real fixtures in `test/fixtures/docdown/`.
-- **Impact:** this doc records every implemented step (what, how, how it was verified) so progress can be followed commit by commit on https://github.com/phucnh294/Extension.
+- **Where:** `docdown/` (shipped), `scripts/build-docdown.mjs`, shared `scripts/lib.mjs`, tests `test/docdown.engine.test.mjs` + `test/docdown.e2e.test.mjs`, real fixtures in `test/fixtures/docdown/real/`, store files in `store/docdown/`.
+- **Impact:** v1.0.0 complete — 18 tests pass (engine on 7 real pages + extension e2e), `dist/docdown-1.0.0.zip` ready to submit. This doc records every step (what, how, how it was verified) commit by commit on https://github.com/phucnh294/Extension.
 
 ## Docdown step plan and status
 | Step | Content | Status |
@@ -32,7 +32,50 @@ related: [rag-ai-local/functionality-docs/10072026/01_readown-build-architecture
 | 3 | Popup (preview, copy, download), options page, context menu, shortcut | done |
 | 4 | End-to-end tests on every fixture | done |
 | 5 | Store assets, listing, privacy policy, zip | done |
-| 6 | Final architecture doc + README | todo |
+| 6 | Final architecture doc + README | done |
+
+## Docdown architecture overview (end state)
+```
+ trigger (grants activeTab)              popup (src/popup.js)                     clipped tab (isolated world)
+ ─────────────────────────               ─────────────────────                    ───────────────────────────
+ toolbar button ───────────────────────► load settings (frontmatter.js)
+ Alt+Shift+M (_execute_action) ────────► take pendingMode (storage.session)
+ right-click menu ─► background.js ────► executeScript(files) ──────────────────► Readability, turndown,
+   stores pendingMode,                                                             gfm plugin, clip.js
+   chrome.action.openPopup()             executeScript(func: DocdownClip.run) ──► composed clone
+                                                                                   → [Readability]
+                                         ◄──────────────── { markdown, title… } ── → Turndown + rules → tidy
+                                         front matter + markdown
+                                         preview (Readown renderer + alert boxes) / editable textarea
+                                         Copy · Copy as prompt · Download .md
+ options page (src/options.js) ──► chrome.storage.sync ◄── popup reads/writes settings
+```
+| File | Role |
+|---|---|
+| `docdown/manifest.json` | MV3; `activeTab, scripting, contextMenus, storage`; no host permissions, no content scripts; `_execute_action` = Alt+Shift+M; `minimum_chrome_version` 127 |
+| `docdown/src/clip.js` | conversion engine (`DocdownClip.run`), see step 2 |
+| `docdown/src/popup.*` | UI, clipping orchestration, copy/download, alert boxes in preview |
+| `docdown/src/frontmatter.js` | templates, YAML-safe placeholders, settings load/save (`DocdownFM`) |
+| `docdown/src/options.*` | settings page |
+| `docdown/src/background.js` | context menus → `pendingMode` → `openPopup()` |
+| `docdown/vendor/` (built) | Readability, Turndown, GFM plugin, marked, DOMPurify, GitHub CSS, `readown-render.js` |
+| `scripts/build-docdown.mjs`, `scripts/lib.mjs` | build + shared validation (also used by Readown) |
+| `scripts/capture-docdown-fixtures.mjs` | capture real pages (with shadow DOM) as test fixtures |
+| `scripts/store-assets-docdown.mjs` | store screenshots (live pages + real popup) and promo tiles |
+| `test/docdown-harness.mjs`, `test/docdown-extension.mjs` | fixture serving / engine injection; extension launcher |
+| `test/docdown.engine.test.mjs`, `test/docdown.e2e.test.mjs` | 9 engine tests on real pages, 9 extension e2e tests |
+
+**Commands:** `npm run build:docdown` · `npm run test:docdown` · `npm run package:docdown` ·
+`npm run store-assets:docdown` · `npm run test:all` (Readown + Docdown) ·
+`node scripts/capture-docdown-fixtures.mjs [id…]`.
+
+**Commits** (https://github.com/phucnh294/Extension): step 0 `2bedac3`, step 1 `bf20b15`, step 2
+`52c8f64`, step 3 `521a37c`, step 4 `93d736f`, step 5 `73160eb`, step 6 = the commit that adds this section.
+
+**Known limits:** no access to `chrome://`, the Web Store or the PDF viewer (Chrome's rule — the popup
+says so); a selection inside shadow DOM or an iframe is not supported; token count is an estimate
+(chars / 4); Stack Overflow is untested automatically (Cloudflare challenge for automated browsers);
+the Windows clipboard returns CRLF.
 
 ## Docdown step 0 — setup (shared build helpers and scaffold)
 **What was done**

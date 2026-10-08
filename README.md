@@ -1,4 +1,21 @@
-# Readown — Markdown file viewer (Chrome extension)
+# Chrome extensions: Readown & Docdown
+
+Repo này chứa hai extension Chrome dùng chung bộ build, test và quy trình phát hành:
+
+| Extension | Thư mục | Làm gì | Trạng thái |
+|---|---|---|---|
+| **Readown – Markdown file viewer** | `extension/` | Đọc file `.md` (trên máy và raw GitHub/GitLab/Bitbucket) thành trang đẹp | [Đã có trên Chrome Web Store](https://chromewebstore.google.com/detail/daijgajeokdjadflfcchplafdiaffoab) |
+| **Docdown – Web page to Markdown** | `docdown/` | Chuyển trang web / bài viết / đoạn chọn thành Markdown sạch cho LLM, ghi chú, RAG | Sẵn sàng nộp store ([chi tiết bên dưới](#docdown--web-page-to-markdown)) |
+
+```bash
+npm install
+```
+
+```bash
+npm run test:all
+```
+
+# Readown — Markdown file viewer
 
 Hiển thị file Markdown (`.md`) ngay trong Chrome: file trên máy (`file:///…`) và file raw trên GitHub, Gist, GitLab, Bitbucket
 (ví dụ `raw.githubusercontent.com/…/README.md`). Các trang web khác không bị đụng tới.
@@ -123,7 +140,8 @@ các tab, chế độ Raw, trang Mở file, popup lưu cài đặt. Lần đầu
      (GitHub repo / GitHub Pages / Gist) và dán link.
 
 6. **Distribution**: Public (hoặc Unlisted để thử trước) → **Submit for review**.
-   Content script khớp mọi host `*.md` nên review có thể lâu hơn (thường vài ngày).
+   Content script chỉ khớp file cục bộ và 4 host raw cụ thể (không còn quyền host rộng), nên không bị
+   cảnh báo "Broad Host Permissions".
 
 **Cập nhật phiên bản**: tăng `version` trong `extension/manifest.json` → `npm run package` →
 dev console → *Package* → *Upload new package* → Submit.
@@ -134,3 +152,81 @@ dev console → *Package* → *Upload new package* → Submit.
   dùng trang **Mở file** nếu cần live reload.
 - Chưa hỗ trợ Mermaid / công thức toán (KaTeX).
 - File không phải UTF-8 cũng không phải Windows-1252 có thể hiển thị sai dấu nếu Chrome đoán sai mã hoá.
+
+# Docdown — Web page to Markdown
+
+Chuyển trang đang xem, bài viết chính của trang, hoặc đoạn đang chọn thành Markdown sạch để dán vào
+ChatGPT / Claude / Cursor / Obsidian / Notion hoặc kho tài liệu RAG.
+
+**Tính năng**
+
+- 3 chế độ: **Article** (tự tìm nội dung chính, Mozilla Readability) · **Whole page** · **Selection**
+- Khối code giữ đúng ngôn ngữ (` ```js `, ` ```python ` …), bỏ số dòng, nút Copy, dấu nhắc lệnh;
+  đọc được code nằm trong **shadow DOM** (ví dụ MDN)
+- Hộp ghi chú của Docusaurus / MkDocs / Sphinx / MDN / GitHub → GitHub alert `> [!NOTE]`, `> [!WARNING]`…
+- Bảng → bảng Markdown; link và ảnh → địa chỉ tuyệt đối; bỏ permalink, link "sửa" của wiki
+- Popup: xem trước (alert hiển thị như GitHub) hoặc sửa Markdown, ước tính token, **Copy**,
+  **Copy as prompt** (kèm link nguồn), **Download .md**
+- Front matter: none / basic / template riêng với `{title} {url} {domain} {date} {datetime} {lang} {excerpt}`
+  (giá trị luôn hợp lệ YAML)
+- Mở bằng nút trên thanh công cụ, menu chuột phải hoặc **Alt+Shift+M**
+- Chỉ xin `activeTab, scripting, contextMenus, storage` — **không có quyền host**, không gửi dữ liệu,
+  không code từ xa
+
+Luồng chi tiết từng bước, kiến trúc, các lỗi đã gặp trên trang thật và cách kiểm chứng:
+[rag-ai-local/functionality-docs/10072026/02_docdown-implementation-log.md](rag-ai-local/functionality-docs/10072026/02_docdown-implementation-log.md)
+
+## Docdown: cấu trúc
+
+```
+docdown/                  ← thư mục "Load unpacked" và để đóng gói
+  manifest.json           MV3; activeTab, scripting, contextMenus, storage; lệnh Alt+Shift+M
+  src/clip.js             engine: clone theo cây hiển thị (cả shadow DOM) → Readability → Turndown
+  src/popup.html/js/css   popup: chế độ, front matter, xem trước / sửa, copy, download
+  src/frontmatter.js      template front matter + cài đặt (dùng chung popup và options)
+  src/options.html/js     trang cài đặt
+  src/background.js       menu chuột phải → mở popup với chế độ tương ứng
+  _locales/en, vi         chuỗi giao diện
+  vendor/, icons/         do `npm run build:docdown` tạo ra
+scripts/build-docdown.mjs build; scripts/lib.mjs = helper dùng chung với Readown
+scripts/capture-docdown-fixtures.mjs   chụp lại trang thật làm dữ liệu test
+test/docdown.engine.test.mjs           engine trên 7 trang thật (offline)
+test/docdown.e2e.test.mjs              extension thật: popup, menu, options
+store/docdown/            listing, privacy policy, ảnh store
+```
+
+## Docdown: chạy trên máy
+
+```bash
+npm run build:docdown
+```
+
+`chrome://extensions` → **Developer mode** → **Load unpacked** → chọn thư mục `docdown/`.
+Mở một trang tài liệu bất kỳ → bấm icon M↓ màu xanh lá (hoặc **Alt+Shift+M**, hoặc chuột phải →
+*Clip page to Markdown*). Không cần bật quyền gì thêm.
+
+## Docdown: test, đóng gói, publish
+
+```bash
+npm run test:docdown
+```
+
+18 test: 9 test engine trên 7 trang thật đã chụp (MDN, React, Docusaurus, MkDocs, GitHub README,
+Python docs, Wikipedia tiếng Việt) và 9 test end-to-end của extension. Chụp lại dữ liệu thật:
+`node scripts/capture-docdown-fixtures.mjs`.
+
+```bash
+npm run package:docdown
+```
+
+Tạo `dist/docdown-<version>.zip`. Ảnh store (cần mạng): `npm run store-assets:docdown`.
+Publish giống Readown: đăng `store/docdown/privacy-policy.txt` lên một Gist → Developer Dashboard →
+*New item* → upload zip → dán nội dung và phần giải thích quyền từ `store/docdown/listing.txt` →
+ảnh trong `store/docdown/` → *Submit for review*.
+
+## Docdown: giới hạn đã biết
+
+- Không đọc được trang `chrome://`, Chrome Web Store, trình xem PDF (Chrome chặn) — popup báo rõ.
+- Đoạn chọn bên trong shadow DOM hoặc iframe chưa được hỗ trợ.
+- Số token là ước tính (ký tự / 4), không theo tokenizer của model cụ thể.
+- Clipboard trên Windows trả về xuống dòng CRLF khi dán; file tải về luôn là LF.
