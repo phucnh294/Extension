@@ -1,0 +1,55 @@
+/* Extra styles for viewer.html only (empty state + drop overlay). */
+
+.mdv-empty {
+  max-width: 480px;
+  margin: 12vh auto 0;
+  padding: 48px 32px;
+  border: 2px dashed var(--mdv-border);
+  border-radius: 12px;
+  text-align: center;
+  color: var(--mdv-fg);
+}
+.mdv-empty svg {
+  width: 96px;
+  color: var(--mdv-muted);
+}
+.mdv-empty h1 {
+  margin: 16px 0 8px;
+  font-size: 22px;
+}
+.mdv-empty p {
+  margin: 0 0 20px;
+  color: var(--mdv-muted);
+}
+.mdv-empty .mdv-empty-note {
+  margin: 20px 0 0;
+  font-size: 12px;
+}
+
+.mdv.mdv-dragging::after {
+  content: "";
+  position: fixed;
+  inset: 8px;
+  z-index: 20;
+  border: 3px dashed var(--mdv-accent);
+  border-radius: 12px;
+  background: var(--mdv-accent-bg);
+  pointer-events: none;
+}
+
+.mdv-live {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 8px;
+  color: var(--mdv-muted);
+  font-size: 12px;
+  font-weight: 400;
+}
+.mdv-live::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #1a7f37;
+}

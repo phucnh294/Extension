@@ -1,0 +1,33 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Readown</title>
+    <link rel="icon" href="../icons/icon32.png" />
+    <link rel="stylesheet" href="../vendor/github-markdown.css" />
+    <link rel="stylesheet" href="viewer.css" />
+    <link rel="stylesheet" href="viewer-page.css" />
+  </head>
+  <body class="mdv-page">
+    <template id="empty-state">
+      <section class="mdv-empty">
+        <svg viewBox="0 0 208 128" aria-hidden="true">
+          <rect x="5" y="5" width="198" height="118" rx="10" fill="none" stroke="currentColor" stroke-width="10" />
+          <path fill="currentColor" d="M30 98V30h20l20 25 20-25h20v68H90V59L70 84 50 59v39zm125 0l-30-33h20V30h20v35h20z" />
+        </svg>
+        <h1 data-i18n="dropTitle">Open a Markdown file</h1>
+        <p data-i18n="dropHint">Drop a .md file anywhere on this page, or choose one.</p>
+        <button type="button" class="mdv-btn mdv-primary" data-pick data-i18n="chooseFile">Choose file…</button>
+        <p class="mdv-empty-note" data-i18n="liveReloadHint">Files opened here re-render automatically when you save them.</p>
+      </section>
+    </template>
+    <input type="file" id="file-input" accept=".md,.markdown,.mdown,.mkd,.mkdn,.txt,text/markdown,text/plain" hidden />
+
+    <script src="../vendor/marked.umd.js"></script>
+    <script src="../vendor/purify.min.js"></script>
+    <script src="../vendor/highlight.min.js"></script>
+    <script src="render.js"></script>
+    <script src="viewer.js"></script>
+  </body>
+</html>

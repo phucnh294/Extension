@@ -1,0 +1,87 @@
+{
+  "extName": {
+    "message": "Readown – Markdown file viewer",
+    "description": "Extension name"
+  },
+  "extDescription": {
+    "message": "View Markdown (.md) files in Chrome, local or on GitHub, with GitHub styling, table of contents, code highlighting and dark mode."
+  },
+  "openFile": {
+    "message": "Open a Markdown file…"
+  },
+  "chooseFile": {
+    "message": "Open file…"
+  },
+  "settings": {
+    "message": "Settings"
+  },
+  "theme": {
+    "message": "Theme"
+  },
+  "themeAuto": {
+    "message": "Auto"
+  },
+  "themeLight": {
+    "message": "Light"
+  },
+  "themeDark": {
+    "message": "Dark"
+  },
+  "width": {
+    "message": "Content width"
+  },
+  "widthNormal": {
+    "message": "Normal"
+  },
+  "widthWide": {
+    "message": "Wide"
+  },
+  "widthFull": {
+    "message": "Full"
+  },
+  "fontSize": {
+    "message": "Font size"
+  },
+  "showToc": {
+    "message": "Show table of contents"
+  },
+  "toc": {
+    "message": "Contents"
+  },
+  "contents": {
+    "message": "Contents"
+  },
+  "raw": {
+    "message": "Raw"
+  },
+  "frontMatter": {
+    "message": "Front matter"
+  },
+  "copy": {
+    "message": "Copy"
+  },
+  "copied": {
+    "message": "Copied!"
+  },
+  "fileAccessOff": {
+    "message": "To render .md files opened from your disk, turn on \"Allow access to file URLs\" for this extension."
+  },
+  "enableFileAccess": {
+    "message": "Open extension settings"
+  },
+  "dropTitle": {
+    "message": "Open a Markdown file"
+  },
+  "dropHint": {
+    "message": "Drop a .md file anywhere on this page, or choose one."
+  },
+  "liveReload": {
+    "message": "live"
+  },
+  "liveReloadHint": {
+    "message": "Files opened here re-render automatically when you save them."
+  },
+  "fontReset": {
+    "message": "Reset text size"
+  }
+}

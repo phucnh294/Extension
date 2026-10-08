@@ -1,0 +1,27 @@
+Readown — Privacy Policy
+Last updated: 2026-10-07
+
+Readown is a Chrome extension that displays Markdown files as formatted pages.
+
+Data collection
+The extension does not collect, transmit, sell or share any personal or usage data.
+It has no analytics, no tracking and no server of its own.
+
+What the extension reads
+• The text of Markdown pages you open in Chrome (local file:// files you open, or raw .md / .markdown
+  files on raw.githubusercontent.com, gist.githubusercontent.com, gitlab.com and bitbucket.org), only to render them inside that same tab. This content never leaves your browser.
+• Files you explicitly choose or drop on the extension's "Open a Markdown file" page, for the same purpose.
+
+What the extension stores
+• Display settings only (theme, font size, content width, table-of-contents on/off), saved with
+  chrome.storage.sync so they follow your Chrome profile. No document content is stored.
+
+Network
+The extension makes no network requests of its own. Images and links that a Markdown document itself
+references are loaded by Chrome exactly as they would be for any web page.
+
+Remote code
+All code is bundled inside the extension package; nothing is downloaded or executed from remote sources.
+
+Contact
+Questions about this policy: hoaphu.nyc@gmail.com

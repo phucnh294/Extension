@@ -1,0 +1,53 @@
+NAME
+Readown – Markdown file viewer
+
+SUMMARY (max 132 chars — same as the manifest description)
+View Markdown (.md) files in Chrome, local or on GitHub, with GitHub styling, table of contents, code highlighting and dark mode.
+
+CATEGORY
+Developer Tools
+
+DESCRIPTION
+Open any Markdown file in Chrome and read it as a clean, GitHub-style page instead of plain text.
+
+Features
+• Renders .md / .markdown files opened from your computer (file://) and raw Markdown files on GitHub, Gist, GitLab and Bitbucket
+• GitHub Flavored Markdown: tables, task lists, strikethrough and autolinks
+• Table of contents sidebar that follows your reading position, and link anchors on every heading
+• Syntax highlighting for ~40 common languages, with a Copy button on every code block
+• Text size slider right on the toolbar (12–28 px); light, dark or automatic theme; content width
+• Raw source toggle and collapsible YAML front matter
+• "Open a Markdown file" page: pick or drag & drop a file — it re-renders automatically every time you save it
+• Fixes garbled accents when Chrome guesses the wrong encoding for UTF-8 files without a BOM
+• Safe by design: HTML inside Markdown is sanitized (DOMPurify) and rendered pages cannot run scripts
+• English and Vietnamese interface
+
+Privacy
+Readown collects no data, makes no network requests of its own and contains no remote code.
+Your settings are stored with Chrome sync storage only.
+
+To view local files, open chrome://extensions, click Details on Readown and turn on "Allow access to file URLs".
+
+PERMISSION JUSTIFICATION (Privacy tab)
+storage: Saves the user's display settings (theme, font size, content width, table of contents).
+Host permissions: The content script runs only on local .md / .markdown files (file://) and on raw
+Markdown files at raw.githubusercontent.com, gist.githubusercontent.com, gitlab.com (/-/raw/) and
+bitbucket.org (/raw/), to render the plain-text Markdown as a formatted page. Pages that are already
+HTML are not modified. No data is collected or sent anywhere.
+
+---------------------------------------------------------------------
+MÔ TẢ TIẾNG VIỆT (nếu thêm ngôn ngữ vi cho listing)
+
+Mở file Markdown trong Chrome và đọc như một trang kiểu GitHub thay vì văn bản thô.
+
+• Hiển thị file .md / .markdown mở từ máy (file://) và file Markdown raw trên GitHub, Gist, GitLab, Bitbucket
+• Hỗ trợ GitHub Flavored Markdown: bảng, task list, gạch ngang, autolink
+• Mục lục bên cạnh theo vị trí đang đọc, link neo cho mọi tiêu đề
+• Tô màu code cho ~40 ngôn ngữ phổ biến, nút Sao chép cho mỗi khối code
+• Thanh trượt chỉnh cỡ chữ ngay trên thanh công cụ (12–28 px); giao diện Sáng / Tối / Tự động, độ rộng nội dung
+• Xem mã nguồn, front matter YAML dạng gập
+• Trang "Mở file Markdown": chọn hoặc kéo thả file, tự hiển thị lại mỗi khi bạn lưu
+• Sửa lỗi mất dấu tiếng Việt khi Chrome đoán sai mã hoá file UTF-8 không có BOM
+• An toàn: HTML trong Markdown được lọc, trang đã render không chạy được script
+
+Để xem file trên máy: vào chrome://extensions → Chi tiết → bật "Cho phép truy cập vào URL tệp".

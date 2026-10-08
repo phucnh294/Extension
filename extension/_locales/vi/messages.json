@@ -1,0 +1,86 @@
+{
+  "extName": {
+    "message": "Readown – Markdown file viewer"
+  },
+  "extDescription": {
+    "message": "Hiển thị file Markdown (.md) trong Chrome: file trên máy và trên GitHub, giao diện kiểu GitHub, mục lục, tô màu code và chế độ tối."
+  },
+  "openFile": {
+    "message": "Mở file Markdown…"
+  },
+  "chooseFile": {
+    "message": "Mở file…"
+  },
+  "settings": {
+    "message": "Cài đặt"
+  },
+  "theme": {
+    "message": "Giao diện"
+  },
+  "themeAuto": {
+    "message": "Tự động"
+  },
+  "themeLight": {
+    "message": "Sáng"
+  },
+  "themeDark": {
+    "message": "Tối"
+  },
+  "width": {
+    "message": "Độ rộng nội dung"
+  },
+  "widthNormal": {
+    "message": "Vừa"
+  },
+  "widthWide": {
+    "message": "Rộng"
+  },
+  "widthFull": {
+    "message": "Toàn màn hình"
+  },
+  "fontSize": {
+    "message": "Cỡ chữ"
+  },
+  "showToc": {
+    "message": "Hiện mục lục"
+  },
+  "toc": {
+    "message": "Mục lục"
+  },
+  "contents": {
+    "message": "Mục lục"
+  },
+  "raw": {
+    "message": "Mã nguồn"
+  },
+  "frontMatter": {
+    "message": "Front matter"
+  },
+  "copy": {
+    "message": "Sao chép"
+  },
+  "copied": {
+    "message": "Đã chép!"
+  },
+  "fileAccessOff": {
+    "message": "Để xem file .md mở từ ổ đĩa, hãy bật \"Cho phép truy cập vào URL tệp\" (Allow access to file URLs) cho extension này."
+  },
+  "enableFileAccess": {
+    "message": "Mở cài đặt extension"
+  },
+  "dropTitle": {
+    "message": "Mở file Markdown"
+  },
+  "dropHint": {
+    "message": "Kéo thả file .md vào trang này, hoặc chọn file."
+  },
+  "liveReload": {
+    "message": "tự cập nhật"
+  },
+  "liveReloadHint": {
+    "message": "File mở ở đây sẽ tự hiển thị lại mỗi khi bạn lưu."
+  },
+  "fontReset": {
+    "message": "Về cỡ chữ mặc định"
+  }
+}

@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <img src="../icons/icon32.png" width="20" height="20" alt="" />
+      <strong data-i18n="extName">Readown</strong>
+    </header>
+
+    <button type="button" id="open" class="primary" data-i18n="openFile">Open a Markdown file…</button>
+
+    <div id="file-access" class="notice" hidden>
+      <p data-i18n="fileAccessOff">To render .md files opened from your disk, turn on "Allow access to file URLs".</p>
+      <button type="button" id="open-settings" data-i18n="enableFileAccess">Open extension settings</button>
+    </div>
+
+    <fieldset>
+      <legend data-i18n="settings">Settings</legend>
+      <label>
+        <span data-i18n="theme">Theme</span>
+        <select name="theme">
+          <option value="auto" data-i18n="themeAuto">Auto</option>
+          <option value="light" data-i18n="themeLight">Light</option>
+          <option value="dark" data-i18n="themeDark">Dark</option>
+        </select>
+      </label>
+      <label>
+        <span data-i18n="width">Content width</span>
+        <select name="width">
+          <option value="normal" data-i18n="widthNormal">Normal</option>
+          <option value="wide" data-i18n="widthWide">Wide</option>
+          <option value="full" data-i18n="widthFull">Full</option>
+        </select>
+      </label>
+      <label>
+        <span data-i18n="fontSize">Font size</span>
+        <span class="range">
+          <input type="range" name="fontSize" min="12" max="28" step="1" />
+          <output id="font-size-value">16px</output>
+        </span>
+      </label>
+      <label class="check">
+        <input type="checkbox" name="toc" />
+        <span data-i18n="showToc">Show table of contents</span>
+      </label>
+    </fieldset>
+
+    <script src="render.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
